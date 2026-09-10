@@ -1,0 +1,27 @@
+plugins { id 'com.android.application' }
+
+android {
+    namespace 'br.com.terramistica.launcher'
+    compileSdk 35
+
+    defaultConfig {
+        applicationId 'br.com.terramistica.launcher'
+        minSdk 23
+        targetSdk 35
+        versionCode 1
+        versionName '1.0.0'
+        buildConfigField 'String', 'SERVER_IP', '"190.102.40.7"'
+        buildConfigField 'int', 'SERVER_PORT', '7821'
+        // Depois de enviar a pasta painel para o InfiniteFree, coloque aqui a URL de conteudo.php.
+        buildConfigField 'String', 'CONTENT_URL', '""'
+    }
+
+    buildFeatures { buildConfig true }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+    }
+}
