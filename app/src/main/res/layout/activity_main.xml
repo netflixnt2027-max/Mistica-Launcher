@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent" android:layout_height="match_parent"
+    android:background="@color/purple_dark" android:fillViewport="true">
+    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+        android:orientation="vertical" android:padding="20dp">
+
+        <ImageView android:layout_width="match_parent" android:layout_height="145dp"
+            android:contentDescription="Logo Mística" android:scaleType="centerInside"
+            android:src="@drawable/logo_mistica" />
+
+        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+            android:layout_gravity="center" android:text="BRASIL TERRA MÍSTICA"
+            android:textColor="@color/gold" android:textSize="14sp" android:textStyle="bold" />
+
+        <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:layout_marginTop="20dp" android:background="@drawable/card_bg"
+            android:orientation="vertical" android:padding="18dp">
+            <TextView android:id="@+id/status" android:layout_width="wrap_content"
+                android:layout_height="wrap_content" android:text="● VERIFICANDO SERVIDOR..."
+                android:textColor="@color/gold" android:textSize="16sp" android:textStyle="bold" />
+            <TextView android:id="@+id/players" android:layout_width="wrap_content"
+                android:layout_height="wrap_content" android:layout_marginTop="8dp"
+                android:text="Jogadores: --/--" android:textColor="@color/white" android:textSize="24sp" />
+            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                android:layout_marginTop="6dp" android:text="190.102.40.7:7821"
+                android:textColor="@color/text_muted" android:textSize="13sp" />
+        </LinearLayout>
+
+        <Button android:id="@+id/play" android:layout_width="match_parent"
+            android:layout_height="60dp" android:layout_marginTop="16dp"
+            android:background="@drawable/play_bg" android:text="JOGAR AGORA"
+            android:textColor="#160D22" android:textSize="18sp" android:textStyle="bold" />
+
+        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+            android:layout_marginTop="24dp" android:text="PRÓXIMA GMX"
+            android:textColor="@color/gold" android:textSize="13sp" android:textStyle="bold" />
+        <TextView android:id="@+id/gmx" android:layout_width="match_parent"
+            android:layout_height="wrap_content" android:layout_marginTop="6dp"
+            android:background="@drawable/card_bg" android:padding="16dp"
+            android:text="Todos os dias às 06:00" android:textColor="@color/white" android:textSize="17sp" />
+
+        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+            android:layout_marginTop="18dp" android:text="EVENTO EM DESTAQUE"
+            android:textColor="@color/gold" android:textSize="13sp" android:textStyle="bold" />
+        <TextView android:id="@+id/event" android:layout_width="match_parent"
+            android:layout_height="wrap_content" android:layout_marginTop="6dp"
+            android:background="@drawable/card_bg" android:padding="16dp"
+            android:text="Aguarde novidades da administração."
+            android:textColor="@color/white" android:textSize="16sp" />
+
+        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+            android:layout_marginTop="18dp" android:text="ATUALIZAÇÕES"
+            android:textColor="@color/gold" android:textSize="13sp" android:textStyle="bold" />
+        <TextView android:id="@+id/updates" android:layout_width="match_parent"
+            android:layout_height="wrap_content" android:layout_marginTop="6dp"
+            android:layout_marginBottom="24dp" android:background="@drawable/card_bg"
+            android:padding="16dp" android:text="Versão 1.0 • Launcher oficial"
+            android:textColor="@color/white" android:textSize="16sp" />
+    </LinearLayout>
+</ScrollView>
