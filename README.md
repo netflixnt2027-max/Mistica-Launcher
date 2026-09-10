@@ -28,3 +28,8 @@ Para publicação, use **Build > Generate Signed Bundle / APK** e guarde a chave
 ## Observação legal
 
 O launcher abre um cliente SA-MP instalado. Ele não distribui arquivos do GTA San Andreas.
+
+
+## Compilação automática
+
+Cada envio para `main` gera o artefato `Mistica-Launcher-APK` no GitHub Actions.
