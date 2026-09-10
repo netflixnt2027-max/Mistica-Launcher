@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="purple_dark">#10081D</color>
+    <color name="purple_card">#211238</color>
+    <color name="purple">#8B3DFF</color>
+    <color name="gold">#F5C451</color>
+    <color name="white">#FFFFFF</color>
+    <color name="text_muted">#BEB4CB</color>
+</resources>
