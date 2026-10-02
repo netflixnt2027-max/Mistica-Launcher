@@ -9,12 +9,21 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:padding="20dp">
+        android:padding="18dp">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:text="LAUNCHER OFICIAL"
+            android:textColor="@color/gold"
+            android:textSize="12sp"
+            android:textStyle="bold" />
 
         <ImageView
             android:layout_width="match_parent"
-            android:layout_height="145dp"
-            android:contentDescription="Logo Mística"
+            android:layout_height="150dp"
+            android:contentDescription="Logo Brasil Terra Mística"
             android:scaleType="centerInside"
             android:src="@drawable/logo_mistica" />
 
@@ -23,23 +32,23 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:text="BRASIL TERRA MÍSTICA"
-            android:textColor="@color/gold"
-            android:textSize="14sp"
+            android:textColor="@color/white"
+            android:textSize="18sp"
             android:textStyle="bold" />
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="22dp"
-            android:text="ESCOLHA SEU SERVIDOR"
-            android:textColor="@color/gold"
-            android:textSize="13sp"
-            android:textStyle="bold" />
+            android:layout_gravity="center"
+            android:layout_marginTop="4dp"
+            android:text="ESCOLHA ONDE VOCÊ QUER JOGAR"
+            android:textColor="@color/text_muted"
+            android:textSize="12sp" />
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
+            android:layout_marginTop="18dp"
             android:background="@drawable/card_bg"
             android:orientation="vertical"
             android:padding="18dp">
@@ -47,7 +56,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="🌌 TERRA MÍSTICA RP"
+                android:text="🌌  TERRA MÍSTICA RP"
                 android:textColor="@color/white"
                 android:textSize="20sp"
                 android:textStyle="bold" />
@@ -56,45 +65,45 @@
                 android:id="@+id/terra_status"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="10dp"
+                android:layout_marginTop="9dp"
                 android:text="● VERIFICANDO SERVIDOR..."
                 android:textColor="@color/gold"
-                android:textSize="15sp"
+                android:textSize="14sp"
                 android:textStyle="bold" />
 
             <TextView
                 android:id="@+id/terra_players"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="6dp"
+                android:layout_marginTop="5dp"
                 android:text="Jogadores: --/--"
                 android:textColor="@color/white"
-                android:textSize="19sp" />
+                android:textSize="17sp" />
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="5dp"
+                android:layout_marginTop="3dp"
                 android:text="190.102.40.7:7781"
                 android:textColor="@color/text_muted"
-                android:textSize="13sp" />
+                android:textSize="12sp" />
 
             <Button
                 android:id="@+id/terra_play"
                 android:layout_width="match_parent"
-                android:layout_height="56dp"
-                android:layout_marginTop="14dp"
+                android:layout_height="54dp"
+                android:layout_marginTop="13dp"
                 android:background="@drawable/play_bg"
                 android:text="JOGAR TERRA MÍSTICA"
                 android:textColor="#160D22"
-                android:textSize="16sp"
+                android:textSize="15sp"
                 android:textStyle="bold" />
         </LinearLayout>
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="14dp"
+            android:layout_marginTop="12dp"
             android:background="@drawable/card_bg"
             android:orientation="vertical"
             android:padding="18dp">
@@ -102,7 +111,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="🔥 NEVORA RPG"
+                android:text="🔥  NEVORA RPG"
                 android:textColor="@color/white"
                 android:textSize="20sp"
                 android:textStyle="bold" />
@@ -111,48 +120,78 @@
                 android:id="@+id/nevora_status"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="10dp"
+                android:layout_marginTop="9dp"
                 android:text="● VERIFICANDO SERVIDOR..."
                 android:textColor="@color/gold"
-                android:textSize="15sp"
+                android:textSize="14sp"
                 android:textStyle="bold" />
 
             <TextView
                 android:id="@+id/nevora_players"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="6dp"
+                android:layout_marginTop="5dp"
                 android:text="Jogadores: --/--"
                 android:textColor="@color/white"
-                android:textSize="19sp" />
+                android:textSize="17sp" />
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="5dp"
+                android:layout_marginTop="3dp"
                 android:text="143.14.168.211:26558"
                 android:textColor="@color/text_muted"
-                android:textSize="13sp" />
+                android:textSize="12sp" />
 
             <Button
                 android:id="@+id/nevora_play"
                 android:layout_width="match_parent"
-                android:layout_height="56dp"
-                android:layout_marginTop="14dp"
+                android:layout_height="54dp"
+                android:layout_marginTop="13dp"
                 android:background="@drawable/play_bg"
                 android:text="JOGAR NEVORA"
                 android:textColor="#160D22"
-                android:textSize="16sp"
+                android:textSize="15sp"
+                android:textStyle="bold" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="14dp"
+            android:orientation="horizontal">
+
+            <Button
+                android:id="@+id/refresh_button"
+                android:layout_width="0dp"
+                android:layout_height="50dp"
+                android:layout_weight="1"
+                android:background="@drawable/card_button_bg"
+                android:text="↻  ATUALIZAR"
+                android:textColor="@color/white"
+                android:textSize="13sp"
+                android:textStyle="bold" />
+
+            <Button
+                android:id="@+id/discord_button"
+                android:layout_width="0dp"
+                android:layout_height="50dp"
+                android:layout_marginStart="10dp"
+                android:layout_weight="1"
+                android:background="@drawable/card_button_bg"
+                android:text="DISCORD"
+                android:textColor="@color/white"
+                android:textSize="13sp"
                 android:textStyle="bold" />
         </LinearLayout>
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="24dp"
+            android:layout_marginTop="22dp"
             android:text="PRÓXIMA GMX"
             android:textColor="@color/gold"
-            android:textSize="13sp"
+            android:textSize="12sp"
             android:textStyle="bold" />
 
         <TextView
@@ -161,18 +200,18 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="6dp"
             android:background="@drawable/card_bg"
-            android:padding="16dp"
+            android:padding="15dp"
             android:text="Todos os dias às 06:00"
             android:textColor="@color/white"
-            android:textSize="17sp" />
+            android:textSize="15sp" />
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="18dp"
+            android:layout_marginTop="16dp"
             android:text="EVENTO EM DESTAQUE"
             android:textColor="@color/gold"
-            android:textSize="13sp"
+            android:textSize="12sp"
             android:textStyle="bold" />
 
         <TextView
@@ -181,18 +220,18 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="6dp"
             android:background="@drawable/card_bg"
-            android:padding="16dp"
+            android:padding="15dp"
             android:text="Aguarde novidades da administração."
             android:textColor="@color/white"
-            android:textSize="16sp" />
+            android:textSize="15sp" />
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="18dp"
+            android:layout_marginTop="16dp"
             android:text="ATUALIZAÇÕES"
             android:textColor="@color/gold"
-            android:textSize="13sp"
+            android:textSize="12sp"
             android:textStyle="bold" />
 
         <TextView
@@ -200,12 +239,21 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="6dp"
-            android:layout_marginBottom="24dp"
+            android:layout_marginBottom="18dp"
             android:background="@drawable/card_bg"
-            android:padding="16dp"
+            android:padding="15dp"
             android:text="Versão 1.1.0 • Launcher oficial"
             android:textColor="@color/white"
-            android:textSize="16sp" />
+            android:textSize="15sp" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginBottom="8dp"
+            android:text="Brasil Terra Mística RPG • Launcher Oficial"
+            android:textColor="@color/text_muted"
+            android:textSize="11sp" />
 
     </LinearLayout>
 </ScrollView>
