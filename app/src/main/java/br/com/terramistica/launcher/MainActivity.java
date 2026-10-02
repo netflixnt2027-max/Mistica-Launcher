@@ -24,19 +24,29 @@ import java.net.URL;
 import java.nio.charset.StandardCharsets;
 
 public class MainActivity extends Activity {
-    private TextView status, players, gmx, event, updates;
+    private TextView terraStatus, terraPlayers;
+    private TextView nevoraStatus, nevoraPlayers;
+    private TextView gmx, event, updates;
     private final Handler ui = new Handler(Looper.getMainLooper());
 
     @Override protected void onCreate(Bundle state) {
         super.onCreate(state);
         setContentView(R.layout.activity_main);
-        status = findViewById(R.id.status);
-        players = findViewById(R.id.players);
+
+        terraStatus = findViewById(R.id.terra_status);
+        terraPlayers = findViewById(R.id.terra_players);
+        nevoraStatus = findViewById(R.id.nevora_status);
+        nevoraPlayers = findViewById(R.id.nevora_players);
         gmx = findViewById(R.id.gmx);
         event = findViewById(R.id.event);
         updates = findViewById(R.id.updates);
-        Button play = findViewById(R.id.play);
-        play.setOnClickListener(v -> openSamp());
+
+        Button terraPlay = findViewById(R.id.terra_play);
+        Button nevoraPlay = findViewById(R.id.nevora_play);
+
+        terraPlay.setOnClickListener(v -> openSamp(BuildConfig.TERRA_IP, BuildConfig.TERRA_PORT));
+        nevoraPlay.setOnClickListener(v -> openSamp(BuildConfig.NEVORA_IP, BuildConfig.NEVORA_PORT));
+
         refresh();
     }
 
@@ -46,39 +56,57 @@ public class MainActivity extends Activity {
     }
 
     private void refresh() {
-        new Thread(this::queryServer).start();
-        if (!BuildConfig.CONTENT_URL.isEmpty()) new Thread(this::loadContent).start();
+        new Thread(() -> queryServer(
+                BuildConfig.TERRA_IP, BuildConfig.TERRA_PORT,
+                terraStatus, terraPlayers)).start();
+
+        new Thread(() -> queryServer(
+                BuildConfig.NEVORA_IP, BuildConfig.NEVORA_PORT,
+                nevoraStatus, nevoraPlayers)).start();
+
+        if (!BuildConfig.CONTENT_URL.isEmpty()) {
+            new Thread(this::loadContent).start();
+        }
     }
 
-    private void queryServer() {
+    private void queryServer(String ip, int port, TextView statusView, TextView playersView) {
         try (DatagramSocket socket = new DatagramSocket()) {
             socket.setSoTimeout(3500);
-            String[] parts = BuildConfig.SERVER_IP.split("\\.");
+
+            String[] parts = ip.split("\\.");
             ByteArrayOutputStream request = new ByteArrayOutputStream();
             request.write(new byte[]{'S','A','M','P'});
             for (String part : parts) request.write(Integer.parseInt(part));
-            request.write(BuildConfig.SERVER_PORT & 0xFF);
-            request.write((BuildConfig.SERVER_PORT >> 8) & 0xFF);
+
+            request.write(port & 0xFF);
+            request.write((port >> 8) & 0xFF);
             request.write('i');
+
             byte[] bytes = request.toByteArray();
-            InetAddress address = InetAddress.getByName(BuildConfig.SERVER_IP);
-            socket.send(new DatagramPacket(bytes, bytes.length, address, BuildConfig.SERVER_PORT));
+            InetAddress address = InetAddress.getByName(ip);
+            socket.send(new DatagramPacket(bytes, bytes.length, address, port));
+
             byte[] response = new byte[2048];
             DatagramPacket packet = new DatagramPacket(response, response.length);
             socket.receive(packet);
-            if (packet.getLength() < 16 || response[10] != 'i') throw new Exception("Resposta inválida");
+
+            if (packet.getLength() < 16 || response[10] != 'i') {
+                throw new Exception("Resposta inválida");
+            }
+
             int online = (response[12] & 0xFF) | ((response[13] & 0xFF) << 8);
             int max = (response[14] & 0xFF) | ((response[15] & 0xFF) << 8);
+
             ui.post(() -> {
-                status.setText("● SERVIDOR ONLINE");
-                status.setTextColor(Color.rgb(40, 220, 125));
-                players.setText("Jogadores: " + online + "/" + max);
+                statusView.setText("● SERVIDOR ONLINE");
+                statusView.setTextColor(Color.rgb(40, 220, 125));
+                playersView.setText("Jogadores: " + online + "/" + max);
             });
         } catch (Exception ignored) {
             ui.post(() -> {
-                status.setText("● SERVIDOR OFFLINE");
-                status.setTextColor(Color.rgb(255, 85, 100));
-                players.setText("Jogadores: 0/--");
+                statusView.setText("● SERVIDOR OFFLINE");
+                statusView.setTextColor(Color.rgb(255, 85, 100));
+                playersView.setText("Jogadores: 0/--");
             });
         }
     }
@@ -90,15 +118,28 @@ public class MainActivity extends Activity {
             connection.setConnectTimeout(5000);
             connection.setReadTimeout(5000);
             connection.setRequestProperty("Accept", "application/json");
+
             try (InputStream in = connection.getInputStream()) {
                 ByteArrayOutputStream out = new ByteArrayOutputStream();
                 byte[] buffer = new byte[2048];
-                for (int read; (read = in.read(buffer)) != -1;) out.write(buffer, 0, read);
-                JSONObject json = new JSONObject(out.toString(StandardCharsets.UTF_8.name()));
+
+                for (int read; (read = in.read(buffer)) != -1;) {
+                    out.write(buffer, 0, read);
+                }
+
+                JSONObject json = new JSONObject(
+                        out.toString(StandardCharsets.UTF_8.name()));
+
                 String g = json.optString("gmx", "Todos os dias às 06:00");
                 String e = json.optString("evento", "Sem evento programado.");
-                String u = json.optString("atualizacoes", "Versão 1.0 • Launcher oficial");
-                ui.post(() -> { gmx.setText(g); event.setText(e); updates.setText(u); });
+                String u = json.optString(
+                        "atualizacoes", "Versão 1.1.0 • Launcher oficial");
+
+                ui.post(() -> {
+                    gmx.setText(g);
+                    event.setText(e);
+                    updates.setText(u);
+                });
             }
         } catch (Exception ignored) {
             // Mantém o último conteúdo visível quando o painel estiver indisponível.
@@ -107,18 +148,28 @@ public class MainActivity extends Activity {
         }
     }
 
-    private void openSamp() {
-        Uri server = Uri.parse("samp://" + BuildConfig.SERVER_IP + ":" + BuildConfig.SERVER_PORT);
+    private void openSamp(String ip, int port) {
+        Uri server = Uri.parse("samp://" + ip + ":" + port);
+
         try {
             startActivity(new Intent(Intent.ACTION_VIEW, server));
         } catch (ActivityNotFoundException ex) {
-            Toast.makeText(this, "Instale um cliente SA-MP compatível para jogar.", Toast.LENGTH_LONG).show();
+            Toast.makeText(
+                    this,
+                    "Instale um cliente SA-MP compatível para jogar.",
+                    Toast.LENGTH_LONG
+            ).show();
+
             try {
-                startActivity(new Intent(Intent.ACTION_VIEW,
-                    Uri.parse("market://search?q=SA-MP launcher&c=apps")));
+                startActivity(new Intent(
+                        Intent.ACTION_VIEW,
+                        Uri.parse("market://search?q=SA-MP launcher&c=apps")
+                ));
             } catch (ActivityNotFoundException ignored) {
-                startActivity(new Intent(Intent.ACTION_VIEW,
-                    Uri.parse("https://play.google.com/store/search?q=SA-MP%20launcher&c=apps")));
+                startActivity(new Intent(
+                        Intent.ACTION_VIEW,
+                        Uri.parse("https://play.google.com/store/search?q=SA-MP%20launcher&c=apps")
+                ));
             }
         }
     }
