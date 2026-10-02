@@ -8,10 +8,12 @@ android {
         applicationId 'br.com.terramistica.launcher'
         minSdk 23
         targetSdk 35
-        versionCode 1
-        versionName '1.0.0'
-        buildConfigField 'String', 'SERVER_IP', '"190.102.40.7"'
-        buildConfigField 'int', 'SERVER_PORT', '7821'
+        versionCode 2
+        versionName '1.1.0'
+        buildConfigField 'String', 'TERRA_IP', '"190.102.40.7"'
+        buildConfigField 'int', 'TERRA_PORT', '7781'
+        buildConfigField 'String', 'NEVORA_IP', '"143.14.168.211"'
+        buildConfigField 'int', 'NEVORA_PORT', '26558'
         // Depois de enviar a pasta painel para o InfiniteFree, coloque aqui a URL de conteudo.php.
         buildConfigField 'String', 'CONTENT_URL', '""'
     }
