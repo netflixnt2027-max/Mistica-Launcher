@@ -8,12 +8,12 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
+import android.view.animation.AlphaAnimation;
 import android.widget.Button;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
-
 import org.json.JSONObject;
-
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 import java.net.DatagramPacket;
@@ -24,171 +24,74 @@ import java.net.URL;
 import java.nio.charset.StandardCharsets;
 
 public class MainActivity extends Activity {
-    private static final String DISCORD_URL = "https://discord.gg/KKgsh3n8Mz";
+    private static final String DISCORD_URL="https://discord.gg/KKgsh3n8Mz";
+    private TextView terraStatus,terraPlayers,nevoraStatus,nevoraPlayers,gmx,event,updates,bannerServer,loadingText;
+    private final Handler ui=new Handler(Looper.getMainLooper());
+    private boolean terraOnline=false,nevoraOnline=false;
+    private String selectedIp=BuildConfig.TERRA_IP; private int selectedPort=BuildConfig.TERRA_PORT;
 
-    private TextView terraStatus, terraPlayers;
-    private TextView nevoraStatus, nevoraPlayers;
-    private TextView gmx, event, updates;
-    private final Handler ui = new Handler(Looper.getMainLooper());
-
-    @Override protected void onCreate(Bundle state) {
-        super.onCreate(state);
-        setContentView(R.layout.activity_main);
-
-        terraStatus = findViewById(R.id.terra_status);
-        terraPlayers = findViewById(R.id.terra_players);
-        nevoraStatus = findViewById(R.id.nevora_status);
-        nevoraPlayers = findViewById(R.id.nevora_players);
-        gmx = findViewById(R.id.gmx);
-        event = findViewById(R.id.event);
-        updates = findViewById(R.id.updates);
-
-        Button terraPlay = findViewById(R.id.terra_play);
-        Button nevoraPlay = findViewById(R.id.nevora_play);
-        Button refreshButton = findViewById(R.id.refresh_button);
-        Button discordButton = findViewById(R.id.discord_button);
-
-        terraPlay.setOnClickListener(v -> openSamp(BuildConfig.TERRA_IP, BuildConfig.TERRA_PORT));
-        nevoraPlay.setOnClickListener(v -> openSamp(BuildConfig.NEVORA_IP, BuildConfig.NEVORA_PORT));
-        refreshButton.setOnClickListener(v -> refresh());
-        discordButton.setOnClickListener(v -> openUrl(DISCORD_URL));
-
-        refresh();
+    @Override protected void onCreate(Bundle state){
+        super.onCreate(state); setContentView(R.layout.activity_main);
+        terraStatus=findViewById(R.id.terra_status); terraPlayers=findViewById(R.id.terra_players);
+        nevoraStatus=findViewById(R.id.nevora_status); nevoraPlayers=findViewById(R.id.nevora_players);
+        gmx=findViewById(R.id.gmx); event=findViewById(R.id.event); updates=findViewById(R.id.updates);
+        bannerServer=findViewById(R.id.banner_server); loadingText=findViewById(R.id.loading_text);
+        Button terra=findViewById(R.id.terra_play),nevora=findViewById(R.id.nevora_play),play=findViewById(R.id.play_now);
+        Button refresh=findViewById(R.id.refresh_button),discord=findViewById(R.id.discord_button);
+        terra.setOnClickListener(v->{selectServer(BuildConfig.TERRA_IP,BuildConfig.TERRA_PORT,"Terra Mística RP");openSamp(selectedIp,selectedPort);});
+        nevora.setOnClickListener(v->{selectServer(BuildConfig.NEVORA_IP,BuildConfig.NEVORA_PORT,"Nevora RPG");openSamp(selectedIp,selectedPort);});
+        play.setOnClickListener(v->openSamp(selectedIp,selectedPort));
+        refresh.setOnClickListener(v->refresh()); discord.setOnClickListener(v->openUrl(DISCORD_URL));
+        startLoadingAnimation(); refresh();
     }
 
-    @Override protected void onResume() {
-        super.onResume();
-        refresh();
+    private void startLoadingAnimation(){
+        AlphaAnimation a=new AlphaAnimation(0.35f,1f); a.setDuration(850); a.setRepeatMode(AlphaAnimation.REVERSE); a.setRepeatCount(AlphaAnimation.INFINITE);
+        loadingText.startAnimation(a);
+        new Handler(Looper.getMainLooper()).postDelayed(()->loadingText.setText("LAUNCHER PRONTO • ESCOLHA UM SERVIDOR"),2200);
     }
 
-    private void refresh() {
-        terraStatus.setText("● VERIFICANDO SERVIDOR...");
-        terraStatus.setTextColor(Color.rgb(245, 196, 81));
-        terraPlayers.setText("Jogadores: --/--");
-
-        nevoraStatus.setText("● VERIFICANDO SERVIDOR...");
-        nevoraStatus.setTextColor(Color.rgb(245, 196, 81));
-        nevoraPlayers.setText("Jogadores: --/--");
-
-        new Thread(() -> queryServer(
-                BuildConfig.TERRA_IP, BuildConfig.TERRA_PORT,
-                terraStatus, terraPlayers)).start();
-
-        new Thread(() -> queryServer(
-                BuildConfig.NEVORA_IP, BuildConfig.NEVORA_PORT,
-                nevoraStatus, nevoraPlayers)).start();
-
-        if (!BuildConfig.CONTENT_URL.isEmpty()) {
-            new Thread(this::loadContent).start();
-        }
+    private void selectServer(String ip,int port,String name){
+        selectedIp=ip; selectedPort=port; bannerServer.setText(name+" • selecionado");
     }
 
-    private void queryServer(String ip, int port, TextView statusView, TextView playersView) {
-        try (DatagramSocket socket = new DatagramSocket()) {
-            socket.setSoTimeout(3500);
+    @Override protected void onResume(){super.onResume();refresh();}
 
-            String[] parts = ip.split("\\.");
-            ByteArrayOutputStream request = new ByteArrayOutputStream();
-            request.write(new byte[]{'S','A','M','P'});
-            for (String part : parts) request.write(Integer.parseInt(part));
+    private void refresh(){
+        loadingText.setText("VERIFICANDO SERVIDORES...");
+        new Thread(()->queryServer(BuildConfig.TERRA_IP,BuildConfig.TERRA_PORT,terraStatus,terraPlayers,true)).start();
+        new Thread(()->queryServer(BuildConfig.NEVORA_IP,BuildConfig.NEVORA_PORT,nevoraStatus,nevoraPlayers,false)).start();
+        if(!BuildConfig.CONTENT_URL.isEmpty())new Thread(this::loadContent).start();
+    }
 
-            request.write(port & 0xFF);
-            request.write((port >> 8) & 0xFF);
-            request.write('i');
+    private void queryServer(String ip,int port,TextView status,TextView players,boolean terra){
+        try(DatagramSocket socket=new DatagramSocket()){
+            socket.setSoTimeout(3500); String[] parts=ip.split("\\."); ByteArrayOutputStream req=new ByteArrayOutputStream();
+            req.write(new byte[]{'S','A','M','P'}); for(String p:parts)req.write(Integer.parseInt(p));
+            req.write(port&255);req.write((port>>8)&255);req.write('i'); byte[] data=req.toByteArray();
+            socket.send(new DatagramPacket(data,data.length,InetAddress.getByName(ip),port));
+            byte[] response=new byte[2048]; DatagramPacket packet=new DatagramPacket(response,response.length);socket.receive(packet);
+            if(packet.getLength()<16||response[10]!='i')throw new Exception();
+            int online=(response[12]&255)|((response[13]&255)<<8),max=(response[14]&255)|((response[15]&255)<<8);
+            ui.post(()->{status.setText("● SERVIDOR ONLINE");status.setTextColor(Color.rgb(40,220,125));players.setText("Jogadores: "+online+"/"+max);if(terra)terraOnline=true;else nevoraOnline=true;loadingText.setText("SERVIDORES VERIFICADOS • PRONTO PARA JOGAR");});
+        }catch(Exception e){ui.post(()->{status.setText("● SERVIDOR OFFLINE");status.setTextColor(Color.rgb(255,85,100));players.setText("Jogadores: 0/--");});}
+    }
 
-            byte[] bytes = request.toByteArray();
-            InetAddress address = InetAddress.getByName(ip);
-            socket.send(new DatagramPacket(bytes, bytes.length, address, port));
-
-            byte[] response = new byte[2048];
-            DatagramPacket packet = new DatagramPacket(response, response.length);
-            socket.receive(packet);
-
-            if (packet.getLength() < 16 || response[10] != 'i') {
-                throw new Exception("Resposta inválida");
+    private void loadContent(){
+        HttpURLConnection c=null;try{
+            c=(HttpURLConnection)new URL(BuildConfig.CONTENT_URL).openConnection();c.setConnectTimeout(5000);c.setReadTimeout(5000);c.setRequestProperty("Accept","application/json");
+            try(InputStream in=c.getInputStream()){ByteArrayOutputStream out=new ByteArrayOutputStream();byte[] b=new byte[2048];for(int n;(n=in.read(b))!=-1;)out.write(b,0,n);
+                JSONObject j=new JSONObject(out.toString(StandardCharsets.UTF_8.name()));String gv=j.optString("gmx","Todos os dias às 06:00"),ev=j.optString("evento","Sem evento programado."),up=j.optString("atualizacoes","Versão 1.1.0 • Launcher oficial");
+                ui.post(()->{gmx.setText(gv);event.setText(ev);updates.setText(up);});
             }
-
-            int online = (response[12] & 0xFF) | ((response[13] & 0xFF) << 8);
-            int max = (response[14] & 0xFF) | ((response[15] & 0xFF) << 8);
-
-            ui.post(() -> {
-                statusView.setText("● SERVIDOR ONLINE");
-                statusView.setTextColor(Color.rgb(40, 220, 125));
-                playersView.setText("Jogadores: " + online + "/" + max);
-            });
-        } catch (Exception ignored) {
-            ui.post(() -> {
-                statusView.setText("● SERVIDOR OFFLINE");
-                statusView.setTextColor(Color.rgb(255, 85, 100));
-                playersView.setText("Jogadores: 0/--");
-            });
-        }
+        }catch(Exception ignored){}finally{if(c!=null)c.disconnect();}
     }
 
-    private void loadContent() {
-        HttpURLConnection connection = null;
-        try {
-            connection = (HttpURLConnection) new URL(BuildConfig.CONTENT_URL).openConnection();
-            connection.setConnectTimeout(5000);
-            connection.setReadTimeout(5000);
-            connection.setRequestProperty("Accept", "application/json");
-
-            try (InputStream in = connection.getInputStream()) {
-                ByteArrayOutputStream out = new ByteArrayOutputStream();
-                byte[] buffer = new byte[2048];
-
-                for (int read; (read = in.read(buffer)) != -1;) {
-                    out.write(buffer, 0, read);
-                }
-
-                JSONObject json = new JSONObject(
-                        out.toString(StandardCharsets.UTF_8.name()));
-
-                String g = json.optString("gmx", "Todos os dias às 06:00");
-                String e = json.optString("evento", "Sem evento programado.");
-                String u = json.optString(
-                        "atualizacoes", "Versão 1.1.0 • Launcher oficial");
-
-                ui.post(() -> {
-                    gmx.setText(g);
-                    event.setText(e);
-                    updates.setText(u);
-                });
-            }
-        } catch (Exception ignored) {
-        } finally {
-            if (connection != null) connection.disconnect();
-        }
+    private void openSamp(String ip,int port){
+        Uri server=Uri.parse("samp://"+ip+":"+port);try{startActivity(new Intent(Intent.ACTION_VIEW,server));}
+        catch(ActivityNotFoundException ex){Toast.makeText(this,"Instale um cliente SA-MP compatível para jogar.",Toast.LENGTH_LONG).show();
+            try{startActivity(new Intent(Intent.ACTION_VIEW,Uri.parse("market://search?q=SA-MP launcher&c=apps")));}
+            catch(ActivityNotFoundException ignored){openUrl("https://play.google.com/store/search?q=SA-MP%20launcher&c=apps");}}
     }
-
-    private void openSamp(String ip, int port) {
-        Uri server = Uri.parse("samp://" + ip + ":" + port);
-
-        try {
-            startActivity(new Intent(Intent.ACTION_VIEW, server));
-        } catch (ActivityNotFoundException ex) {
-            Toast.makeText(
-                    this,
-                    "Instale um cliente SA-MP compatível para jogar.",
-                    Toast.LENGTH_LONG
-            ).show();
-
-            try {
-                startActivity(new Intent(
-                        Intent.ACTION_VIEW,
-                        Uri.parse("market://search?q=SA-MP launcher&c=apps")
-                ));
-            } catch (ActivityNotFoundException ignored) {
-                openUrl("https://play.google.com/store/search?q=SA-MP%20launcher&c=apps");
-            }
-        }
-    }
-
-    private void openUrl(String url) {
-        try {
-            startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(url)));
-        } catch (ActivityNotFoundException ignored) {
-            Toast.makeText(this, "Não foi possível abrir o link.", Toast.LENGTH_SHORT).show();
-        }
-    }
+    private void openUrl(String url){try{startActivity(new Intent(Intent.ACTION_VIEW,Uri.parse(url)));}catch(ActivityNotFoundException ignored){Toast.makeText(this,"Não foi possível abrir o link.",Toast.LENGTH_SHORT).show();}}
 }
