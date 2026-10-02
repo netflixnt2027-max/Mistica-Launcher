@@ -24,6 +24,8 @@ import java.net.URL;
 import java.nio.charset.StandardCharsets;
 
 public class MainActivity extends Activity {
+    private static final String DISCORD_URL = "https://discord.gg/KKgsh3n8Mz";
+
     private TextView terraStatus, terraPlayers;
     private TextView nevoraStatus, nevoraPlayers;
     private TextView gmx, event, updates;
@@ -43,9 +45,13 @@ public class MainActivity extends Activity {
 
         Button terraPlay = findViewById(R.id.terra_play);
         Button nevoraPlay = findViewById(R.id.nevora_play);
+        Button refreshButton = findViewById(R.id.refresh_button);
+        Button discordButton = findViewById(R.id.discord_button);
 
         terraPlay.setOnClickListener(v -> openSamp(BuildConfig.TERRA_IP, BuildConfig.TERRA_PORT));
         nevoraPlay.setOnClickListener(v -> openSamp(BuildConfig.NEVORA_IP, BuildConfig.NEVORA_PORT));
+        refreshButton.setOnClickListener(v -> refresh());
+        discordButton.setOnClickListener(v -> openUrl(DISCORD_URL));
 
         refresh();
     }
@@ -56,6 +62,14 @@ public class MainActivity extends Activity {
     }
 
     private void refresh() {
+        terraStatus.setText("● VERIFICANDO SERVIDOR...");
+        terraStatus.setTextColor(Color.rgb(245, 196, 81));
+        terraPlayers.setText("Jogadores: --/--");
+
+        nevoraStatus.setText("● VERIFICANDO SERVIDOR...");
+        nevoraStatus.setTextColor(Color.rgb(245, 196, 81));
+        nevoraPlayers.setText("Jogadores: --/--");
+
         new Thread(() -> queryServer(
                 BuildConfig.TERRA_IP, BuildConfig.TERRA_PORT,
                 terraStatus, terraPlayers)).start();
@@ -142,7 +156,6 @@ public class MainActivity extends Activity {
                 });
             }
         } catch (Exception ignored) {
-            // Mantém o último conteúdo visível quando o painel estiver indisponível.
         } finally {
             if (connection != null) connection.disconnect();
         }
@@ -166,11 +179,16 @@ public class MainActivity extends Activity {
                         Uri.parse("market://search?q=SA-MP launcher&c=apps")
                 ));
             } catch (ActivityNotFoundException ignored) {
-                startActivity(new Intent(
-                        Intent.ACTION_VIEW,
-                        Uri.parse("https://play.google.com/store/search?q=SA-MP%20launcher&c=apps")
-                ));
+                openUrl("https://play.google.com/store/search?q=SA-MP%20launcher&c=apps");
             }
+        }
+    }
+
+    private void openUrl(String url) {
+        try {
+            startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(url)));
+        } catch (ActivityNotFoundException ignored) {
+            Toast.makeText(this, "Não foi possível abrir o link.", Toast.LENGTH_SHORT).show();
         }
     }
 }
